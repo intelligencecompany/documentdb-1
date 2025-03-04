@@ -45,23 +45,23 @@ jobs:
             --size Standard_B1s \
             --output none || echo "VM already exists"
 
-      - name: Get VM public IP
-        id: get-vm-ip
-        run: |
-          echo "VM_IP=$(az vm show --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name TERMSMONITOR --show-details --query publicIps -o tsv)" >> $GITHUB_ENV
-
   deploy:
     runs-on: ubuntu-latest
     needs: infra
 
     steps:
+      - name: Get VM public IP
+        id: get-vm-ip
+        run: |
+          echo "VM_IP=$(az vm show --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name TERMSMONITOR --show-details --query publicIps -o tsv)" >> $GITHUB_ENV
+
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.AZURE_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ env.VM_IP }} >> ~/.ssh/known_hosts
-          
+
       - name: Install Docker on VM
         run: |
           ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
