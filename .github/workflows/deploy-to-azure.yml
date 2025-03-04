@@ -49,6 +49,11 @@ jobs:
     needs: infra
 
     steps:
+      - name: Azure CLI Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+     
       - name: Get VM public IP
         id: get-vm-ip
         run: |
