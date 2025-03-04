@@ -49,3 +49,7 @@ fi
 ./scripts/start_oss_server.sh
 
 exec "$@"
+
+# az ad sp create-for-rbac --name "TERMSMONITOR-GITHUB-SP" --role contributor --scopes /subscriptions/cb3e4e98-0e25-431b-9d61-521be63f873f/resourceGroups/RG-TERMSMONITOR --sdk-auth
+# docker build -t documentdb_new -f -f .devcontainer/Dockerfile
+# docker run -p 9712:9712 -v %cd%:/home/documentdb/code -it documentdb_new /bin/bash
