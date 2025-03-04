@@ -43,7 +43,7 @@ jobs:
       - name: Get VM public IP
         id: get-vm-ip
         run: |
-          echo "VM_IP=$(az vm show --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name documentdb-vm --show-details --query publicIps -o tsv)" >> $GITHUB_ENV
+          echo "VM_IP=$(az vm show --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name TERMSMONITOR --show-details --query publicIps -o tsv)" >> $GITHUB_ENV
 
       - name: Install Docker on VM
         run: |
