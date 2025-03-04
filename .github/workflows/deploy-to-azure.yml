@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,6 +24,11 @@ jobs:
           docker build -t ghcr.io/${{ github.repository }}/documentdb:latest . -f .devcontainer/Dockerfile
           docker push ghcr.io/${{ github.repository }}/documentdb:latest
 
+  infra:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
       - name: Azure CLI Login
         uses: azure/login@v1
         with:
@@ -45,6 +50,18 @@ jobs:
         run: |
           echo "VM_IP=$(az vm show --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name TERMSMONITOR --show-details --query publicIps -o tsv)" >> $GITHUB_ENV
 
+  deploy:
+    runs-on: ubuntu-latest
+    needs: infra
+
+    steps:
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.AZURE_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ env.VM_IP }} >> ~/.ssh/known_hosts
+          
       - name: Install Docker on VM
         run: |
           ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
