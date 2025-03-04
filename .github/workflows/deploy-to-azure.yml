@@ -40,6 +40,7 @@ jobs:
             --name termsmonitor-documentdb \
             --image ${{ secrets.ACR_LOGIN_SERVER }}/documentdb:latest \
             --ip-address Public \
+            --os-type Linux \
             --registry-login-server ${{ secrets.ACR_LOGIN_SERVER }} \
             --registry-username ${{ secrets.ACR_USERNAME }} \
             --registry-password ${{ secrets.ACR_PASSWORD }} \
