@@ -34,7 +34,7 @@ jobs:
           az vm create \
             --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
             --name TERMSMONITOR \
-            --image UbuntuLTS \
+            --image Ubuntu2404 \
             --admin-username azureuser \
             --generate-ssh-keys \
             --size Standard_B1s \
