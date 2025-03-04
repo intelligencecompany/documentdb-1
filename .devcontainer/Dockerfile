@@ -105,6 +105,7 @@ RUN add-apt-repository -y ppa:ubuntugis/ppa && apt-get update && \
 COPY scripts/install_setup_postgis.sh /tmp/install_setup/
 RUN [ "bin/bash", "-c", "PGVERSION=$PG_VERSION /tmp/install_setup/install_setup_postgis.sh" ]
 
+
 # locale
 RUN rm -rf /var/lib/apt/lists/* \
     && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
@@ -126,3 +127,10 @@ ENV PATH=$PATH:/usr/lib/postgresql/$PG_VERSION/bin
 
 USER documentdb
 WORKDIR /home/documentdb
+
+EXPOSE 9712 5432
+
+COPY .devcontainer/startup.sh /home/documentdb/startup.sh
+RUN sudo chmod +x /home/documentdb/startup.sh
+
+ENTRYPOINT ["/home/documentdb/startup.sh"]

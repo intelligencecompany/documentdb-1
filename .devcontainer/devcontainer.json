@@ -17,12 +17,18 @@
             ]
         }
     },
-    "forwardPorts": [9712],
-        "portsAttributes": {
+    "forwardPorts": [9712, 5432],
+    "portsAttributes": {
         "9712": {
             "label": "PostgresPort",
             "onAutoForward": "notify",
             "requireLocalPort": false
+        },
+        "5432": {
+            "label": "PostgresPort",
+            "onAutoForward": "notify",
+            "requireLocalPort": false
         }
-    }
+    },
+    "postStartCommand": "./code/scripts/start_oss_server.sh"
 }
