@@ -60,7 +60,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.AZURE_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ env.VM_IP }} >> ~/.ssh/known_hosts
+          ssh-keyscan ${{ env.VM_IP }} >> ~/.ssh/known_hosts
 
       - name: Install Docker on VM
         run: |
