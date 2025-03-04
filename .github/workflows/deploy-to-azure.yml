@@ -45,6 +45,9 @@ jobs:
             --registry-username ${{ secrets.ACR_USERNAME }} \
             --registry-password ${{ secrets.ACR_PASSWORD }} \
             --dns-name-label termsmonitor-documentdb \
+            --azure-file-volume-account-name termsmonitor \
+            --azure-file-volume-account-key ${{ secrets.AZURE_STORAGE_KEY }} \
+            --azure-file-volume-share-name termsmonitor \
             --azure-file-volume-mount-path /home/documentdb/code \
             --ports 9712 5432
             --command-line "/bin/bash"
