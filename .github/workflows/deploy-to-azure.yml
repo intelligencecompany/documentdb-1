@@ -41,6 +41,7 @@ jobs:
             --image ${{ secrets.ACR_LOGIN_SERVER }}/documentdb:latest \
             --cpu 1 \
             --memory 1 \
+            --os-type Linux \
             --registry-login-server ${{ secrets.ACR_LOGIN_SERVER }} \
             --registry-username ${{ secrets.ACR_USERNAME }} \
             --registry-password ${{ secrets.ACR_PASSWORD }} \
