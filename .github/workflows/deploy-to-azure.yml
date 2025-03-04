@@ -37,12 +37,13 @@ jobs:
         run: |
           az container create \
             --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --name documentdb-container \
+            --name termsmonitor-documentdb \
             --image ${{ secrets.ACR_LOGIN_SERVER }}/documentdb:latest \
-            --cpu 1 \
-            --memory 1 \
+            --ip-address Public \
             --registry-login-server ${{ secrets.ACR_LOGIN_SERVER }} \
             --registry-username ${{ secrets.ACR_USERNAME }} \
             --registry-password ${{ secrets.ACR_PASSWORD }} \
-            --dns-name-label documentdb-container \
+            --dns-name-label termsmonitor-documentdb \
+            --azure-file-volume-mount-path /home/documentdb/code \
             --ports 9712 5432
+            --command-line "/bin/bash"
