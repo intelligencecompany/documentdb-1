@@ -84,7 +84,7 @@ jobs:
   
       - name: Install Docker on VM
         run: |
-          echo "${{ steps.setup-ssh-key.outputs.private_key }}" > private_key.pem
+          echo "${{ steps.setup-ssh-key.outputs.private_key }}" | sed 's/\\n/\n/g'sed > private_key.pem
           chmod 600 private_key.pem
           ssh -i 'private_key.pem' -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
             sudo apt-get update
