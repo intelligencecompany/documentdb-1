@@ -72,7 +72,7 @@ jobs:
 
       - name: Install Docker on VM
         run: |
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
+          ssh -i '~/.ssh/id_rsa' -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
             sudo apt-get update
             sudo apt-get install -y docker.io
             sudo systemctl start docker
