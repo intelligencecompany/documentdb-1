@@ -46,11 +46,11 @@ jobs:
           echo "::set-output name=private_key::$(awk '{printf "%s\\n", $0}' ~/.ssh/id_rsa)"
           echo "SSH key setup complete."
 
-      - name: Update GitHub Secret with Private Key
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh secret set AZURE_SSH_PRIVATE_KEY -b "${{ steps.create-ssh-key.outputs.private_key }}" -R ${{ github.repository }}
+      # - name: Update GitHub Secret with Private Key
+      #   env:
+      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   run: |
+      #     gh secret set AZURE_SSH_PRIVATE_KEY -b "${{ steps.create-ssh-key.outputs.private_key }}" -R ${{ github.repository }}
           
       - name: Create Azure VM if not exists
         run: |
@@ -75,6 +75,15 @@ jobs:
           echo "VM IP: $VM_IP"
           ssh -o StrictHostKeyChecking=no azureuser@$VM_IP "mkdir -p ~/.ssh && echo '$(cat ~/.ssh/id_rsa.pub)' >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys && chmod 700 ~/.ssh"
           echo "SSH key successfully added to VM."
+
+      - name: Install Docker on VM
+        run: |
+          ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
+            sudo apt-get update
+            sudo apt-get install -y docker.io
+            sudo systemctl start docker
+            sudo systemctl enable docker
+          EOF
     
   deploy:
     runs-on: ubuntu-latest
@@ -92,20 +101,18 @@ jobs:
           echo "VM_IP=$(az vm show --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name TERMSMONITOR --show-details --query publicIps -o tsv)" >> $GITHUB_ENV
       
       - name: Set up SSH key
+        id: setup-ssh-key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.AZURE_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          az vm run-command invoke \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --name TERMSMONITOR \
+            --command-id RunShellScript \
+            --scripts "cat /home/azureuser/.ssh/id_rsa" \
+            --query "value[0].message" -o tsv > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ env.VM_IP }} >> ~/.ssh/known_hosts
-
-      - name: Install Docker on VM
-        run: |
-          ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
-            sudo apt-get update
-            sudo apt-get install -y docker.io
-            sudo systemctl start docker
-            sudo systemctl enable docker
-          EOF
+          echo "::set-output name=private_key::$(awk '{printf "%s\\n", $0}' ~/.ssh/id_rsa)"
 
       - name: Pull and run Docker image on VM
         run: |
