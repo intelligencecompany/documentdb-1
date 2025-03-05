@@ -84,8 +84,11 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ env.VM_IP }} >> ~/.ssh/known_hosts
 
-          # Encode and store the private key safely
-          echo "PRIVATE_KEY_B64=$(base64 -w 0 ~/.ssh/id_rsa)" >> $GITHUB_ENV
+          # Encode the private key in Base64
+          PRIVATE_KEY_B64=$(base64 ~/.ssh/id_rsa | tr -d '\n')
+          
+          # Store in GitHub environment variable
+          echo "PRIVATE_KEY_B64=$PRIVATE_KEY_B64" >> $GITHUB_ENV
 
       - name: Install Docker on VM
         run: |
