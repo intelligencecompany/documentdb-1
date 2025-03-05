@@ -50,10 +50,19 @@ jobs:
     needs: infra
 
     steps:
+      - name: Azure CLI Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
       - name: Get VM public IP
         id: get-vm-ip
         run: |
           echo "VM_IP=$(az vm show --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name TERMSMONITOR --show-details --query publicIps -o tsv)" >> $GITHUB_ENV
+
+      # - name: Install SSH key
+      #   run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+      #   shell: bash
 
       - name: Install Docker on VM
         run: |
