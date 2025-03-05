@@ -47,7 +47,8 @@ jobs:
 
       - name: Update GitHub Secret with Private Key
         run: |
-          gh secret set AZURE_SSH_PRIVATE_KEY -b"${{ steps.create-ssh-key.outputs.private_key }}" --repo ${{ github.repository }}
+          echo ${{ steps.create-ssh-key.outputs.private_key }}
+          gh secret set AZURE_SSH_PRIVATE_KEY -b "${{ steps.create-ssh-key.outputs.private_key }}" -R ${{ github.repository }}
           
       - name: Create Azure VM if not exists
         run: |
