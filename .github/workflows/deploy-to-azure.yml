@@ -97,7 +97,7 @@ jobs:
           chmod 600 private_key.pem
 
           # SSH into the VM and install Docker
-          ssh -i private_key.pem -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
             sudo apt-get update
             sudo apt-get install -y docker.io
             sudo systemctl start docker
