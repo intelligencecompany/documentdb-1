@@ -43,7 +43,7 @@ jobs:
           fi
           echo "Private key:"
           cat ~/.ssh/id_rsa
-          echo "::set-output name=private_key::$(cat ~/.ssh/id_rsa)"
+          echo "::set-output name=private_key::$(awk '{printf "%s\\n", $0}' ~/.ssh/id_rsa)"
           echo "SSH key setup complete."
 
       - name: Update GitHub Secret with Private Key
