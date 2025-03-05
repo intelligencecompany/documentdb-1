@@ -42,6 +42,9 @@ jobs:
             ssh-keygen -t rsa -b 4096 -C "ci-cd-pipeline" -f ~/.ssh/id_rsa -N ""
             echo "Private key:"
             cat ~/.ssh/id_rsa
+          else
+            echo "Private key:"
+            cat ~/.ssh/id_rsa
           fi
           echo "SSH key setup complete."
 
