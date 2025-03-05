@@ -26,9 +26,9 @@ if [ ! -f "$FLAG_FILE" ]; then
     make
     sudo make install
 
-    ./start_oss_server.sh
+    start_oss_server.sh
 
-    ./start_oss_server.sh -c
+    start_oss_server.sh -c
 
     # Edit the pg_hba.conf file
     echo "host    all             all             94.215.14.79/32               trust" >> ~/documentdb_test/pg_hba.conf
@@ -46,7 +46,7 @@ else
 fi
 
 # Run the start_oss_server.sh script
-./start_oss_server.sh
+start_oss_server.sh
 
 exec "$@"
 
