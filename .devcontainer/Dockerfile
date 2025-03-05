@@ -130,7 +130,7 @@ WORKDIR /home/documentdb
 
 EXPOSE 9712 5432
 
-COPY .devcontainer/startup.sh /home/documentdb/startup.sh
+COPY scripts/startup.sh /home/documentdb/startup.sh
 RUN sudo chmod +x /home/documentdb/startup.sh
 
 ENTRYPOINT ["/home/documentdb/startup.sh"]

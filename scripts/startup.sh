@@ -17,10 +17,10 @@ if [ ! -f "$FLAG_FILE" ]; then
     echo "First run setup"
 
     # Check if the Makefile exists
-    if [ ! -f "Makefile" ]; then
-        echo "Error: Makefile does not exist."
-        exit 1
-    fi
+    # if [ ! -f "Makefile" ]; then
+    #     echo "Error: Makefile does not exist."
+    #     exit 1
+    # fi
 
     git config --global --add safe.directory /home/DocumentDB/code
     make
