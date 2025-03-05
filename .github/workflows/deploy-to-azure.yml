@@ -72,7 +72,7 @@ jobs:
             --show-details \
                 --query publicIps -o tsv)
 
-      # echo "VM IP: $VM_IP"
+           echo "VM IP: $VM_IP"
       # ssh -o StrictHostKeyChecking=no azureuser@$VM_IP "mkdir -p ~/.ssh && echo '$(cat ~/.ssh/id_rsa.pub)' >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys && chmod 700 ~/.ssh"
       # echo "SSH key successfully added to VM."
 
