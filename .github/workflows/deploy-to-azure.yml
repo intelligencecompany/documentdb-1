@@ -87,7 +87,7 @@ jobs:
 
       - name: Install Docker on VM
         run: |
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
             sudo apt-get update
             sudo apt-get install -y docker.io
             sudo systemctl start docker
@@ -96,7 +96,7 @@ jobs:
 
       - name: Pull and run Docker image on VM
         run: |
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
             sudo docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
             sudo docker pull ghcr.io/${{ github.repository }}/documentdb:latest
             sudo docker run -v $(pwd):/home/documentdb/code -d -p 9712:9712 -p 5432:5432 --name documentdb ghcr.io/${{ github.repository }}/documentdb:latest -it documentdb /bin/bash 
