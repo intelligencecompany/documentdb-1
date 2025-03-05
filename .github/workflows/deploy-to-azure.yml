@@ -71,31 +71,36 @@ jobs:
     # needs: build
 
     steps:
-    - name: Get VM public IP
-      id: get-vm-ip
-      run: |
-        echo "VM_IP=$(az vm show --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name TERMSMONITOR --show-details --query publicIps -o tsv)" >> $GITHUB_ENV
-    
-    - name: Set up SSH key
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.AZURE_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ env.VM_IP }} >> ~/.ssh/known_hosts
+      - name: Azure CLI Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          
+      - name: Get VM public IP
+        id: get-vm-ip
+        run: |
+          echo "VM_IP=$(az vm show --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name TERMSMONITOR --show-details --query publicIps -o tsv)" >> $GITHUB_ENV
+      
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.AZURE_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ env.VM_IP }} >> ~/.ssh/known_hosts
 
-    - name: Install Docker on VM
-      run: |
-        ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
-          sudo apt-get update
-          sudo apt-get install -y docker.io
-          sudo systemctl start docker
-          sudo systemctl enable docker
-        EOF
+      - name: Install Docker on VM
+        run: |
+          ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
+            sudo apt-get update
+            sudo apt-get install -y docker.io
+            sudo systemctl start docker
+            sudo systemctl enable docker
+          EOF
 
-    - name: Pull and run Docker image on VM
-      run: |
-        ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
-          sudo docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
-          sudo docker pull ghcr.io/${{ github.repository }}/documentdb:latest
-          sudo docker run -v $(pwd):/home/documentdb/code -d -p 9712:9712 -p 5432:5432 --name documentdb ghcr.io/${{ github.repository }}/documentdb:latest -it documentdb /bin/bash 
-        EOF
+      - name: Pull and run Docker image on VM
+        run: |
+          ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
+            sudo docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+            sudo docker pull ghcr.io/${{ github.repository }}/documentdb:latest
+            sudo docker run -v $(pwd):/home/documentdb/code -d -p 9712:9712 -p 5432:5432 --name documentdb ghcr.io/${{ github.repository }}/documentdb:latest -it documentdb /bin/bash 
+          EOF
