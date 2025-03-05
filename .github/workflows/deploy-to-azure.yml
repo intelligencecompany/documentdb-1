@@ -34,18 +34,6 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
       
-      - name: Check and Create SSH Key
-        id: create-ssh-key
-        run: |
-          mkdir -p ~/.ssh
-          if [ ! -f ~/.ssh/id_rsa ]; then
-            ssh-keygen -t rsa -b 4096 -C "ci-cd-pipeline" -f ~/.ssh/id_rsa -N ""
-          fi
-          echo "Private key:"
-          cat ~/.ssh/id_rsa
-          echo "::set-output name=private_key::$(awk '{printf "%s\\n", $0}' ~/.ssh/id_rsa)"
-          echo "SSH key setup complete."
-
       # - name: Update GitHub Secret with Private Key
       #   env:
       #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -84,8 +72,6 @@ jobs:
             sudo systemctl enable docker
           EOF
   
-
-    
   deploy:
     runs-on: ubuntu-latest
     needs: infra
@@ -101,19 +87,10 @@ jobs:
         run: |
           echo "VM_IP=$(az vm show --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name TERMSMONITOR --show-details --query publicIps -o tsv)" >> $GITHUB_ENV
       
-      - name: Set up SSH key
-        id: setup-ssh-key
-        run: |
-          mkdir -p ~/.ssh
-          az vm run-command invoke \
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --name TERMSMONITOR \
-            --command-id RunShellScript \
-            --scripts "cat /home/azureuser/.ssh/id_rsa" \
-            --query "value[0].message" -o tsv > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ env.VM_IP }} >> ~/.ssh/known_hosts
-          echo "::set-output name=private_key::$(awk '{printf "%s\\n", $0}' ~/.ssh/id_rsa)"
+      - name: Configure SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
 
       - name: Pull and run Docker image on VM
         run: |
