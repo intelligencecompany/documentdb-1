@@ -40,12 +40,10 @@ jobs:
           mkdir -p ~/.ssh
           if [ ! -f ~/.ssh/id_rsa ]; then
             ssh-keygen -t rsa -b 4096 -C "ci-cd-pipeline" -f ~/.ssh/id_rsa -N ""
-            echo "Private key:"
-            cat ~/.ssh/id_rsa
-          else
-            echo "Private key:"
-            cat ~/.ssh/id_rsa
           fi
+          echo "Private key:"
+          cat ~/.ssh/id_rsa
+          echo "::set-output name=private_key::$(cat ~/.ssh/id_rsa)"
           echo "SSH key setup complete."
 
       - name: Update GitHub Secret with Private Key
