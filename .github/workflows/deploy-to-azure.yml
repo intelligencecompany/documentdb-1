@@ -85,14 +85,12 @@ jobs:
           ssh-keyscan -H ${{ env.VM_IP }} >> ~/.ssh/known_hosts
 
           # Encode and store the private key safely
-          echo "PRIVATE_KEY<<EOF" >> $GITHUB_ENV
-          cat ~/.ssh/id_rsa >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          echo "PRIVATE_KEY_B64=$(base64 -w 0 ~/.ssh/id_rsa)" >> $GITHUB_ENV
 
       - name: Install Docker on VM
         run: |
           # Retrieve and format the private key
-          echo "$PRIVATE_KEY" > private_key.pem
+          echo "$PRIVATE_KEY_B64"| base64 --decode > private_key.pem
           chmod 600 private_key.pem
 
           # SSH into the VM and install Docker
