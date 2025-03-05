@@ -79,14 +79,19 @@ jobs:
             --name TERMSMONITOR \
             --command-id RunShellScript \
             --scripts "cat /home/azureuser/.ssh/id_rsa" \
-            --query "value[0].message" -o tsv | tail -n +2 | sed 's/\r//g' > ~/.ssh/id_rsa
+            --query "value[0].message" -o tsv > raw_key
+
+           Remove any carriage returns and extra lines
+          sed -i 's/\r//g' raw_key  # Handle CRLF to LF
+          # Extract only the key block (if output has extra text)
+          sed -n '/-----BEGIN RSA PRIVATE KEY-----/,/-----END RSA PRIVATE KEY-----/p' raw_key > ~/.ssh/id_rsa
 
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ env.VM_IP }} >> ~/.ssh/known_hosts
 
           # Encode the private key in Base64
-          PRIVATE_KEY_B64=$(base64 ~/.ssh/id_rsa | tr -d '\n')
-          
+          PRIVATE_KEY_B64=$(base64 -w0 ~/.ssh/id_rsa)  # -w0 avoids line breaks
+
           # Store in GitHub environment variable
           echo "PRIVATE_KEY_B64=$PRIVATE_KEY_B64" >> $GITHUB_ENV
 
@@ -97,7 +102,7 @@ jobs:
           chmod 600 private_key.pem
 
           # SSH into the VM and install Docker
-          ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
+          ssh -i private_key.pem -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
             sudo apt-get update
             sudo apt-get install -y docker.io
             sudo systemctl start docker
