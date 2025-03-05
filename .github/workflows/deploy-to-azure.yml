@@ -86,7 +86,7 @@ jobs:
         run: |
           echo "${{ steps.setup-ssh-key.outputs.private_key }}" > private_key.pem
           chmod 600 private_key.pem
-          ssh -i '~/.ssh/id_rsa.pem' -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
+          ssh -i 'private_key.pem' -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
             sudo apt-get update
             sudo apt-get install -y docker.io
             sudo systemctl start docker
