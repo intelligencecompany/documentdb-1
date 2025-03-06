@@ -6,26 +6,26 @@ on:
       - main
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  # build:
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v2
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v1
 
-      - name: Log in to GitHub Packages
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+  #     - name: Log in to GitHub Packages
+  #       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Build and push Docker image
-        run: |
-          git clone https://github.com/${{ github.repository }}.git
-          docker build . -f .devcontainer/Dockerfile -t documentdb
-          docker image tag documentdb ghcr.io/${{ github.repository }}/documentdb:latest
-          docker image ls
-          docker image push ghcr.io/${{ github.repository }}/documentdb:latest
+  #     - name: Build and push Docker image
+  #       run: |
+  #         git clone https://github.com/${{ github.repository }}.git
+  #         docker build . -f .devcontainer/Dockerfile -t documentdb
+  #         docker image tag documentdb ghcr.io/${{ github.repository }}/documentdb:latest
+  #         docker image ls
+  #         docker image push ghcr.io/${{ github.repository }}/documentdb:latest
 
   # infra:
   #   runs-on: ubuntu-latest
@@ -77,7 +77,7 @@ jobs:
   
   deploy:
     runs-on: ubuntu-latest
-    needs: build
+    # needs: build
 
     steps:
       - name: Azure CLI Login
@@ -95,11 +95,11 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
 
-      - name: Add user to docker group
-        run: |
-          ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
-            sudo usermod -aG docker azureuser
-          EOF
+      # - name: Add user to docker group
+      #   run: |
+      #     ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
+      #       sudo usermod -aG docker azureuser
+      #     EOF
       
       - name: Pull and run Docker image on VM
         run: |
