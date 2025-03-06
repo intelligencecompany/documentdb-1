@@ -95,12 +95,12 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
 
-      - name: Configure password-less sudo for azureuser
-        run: |
-          ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
-            echo "azureuser ALL=(ALL) NOPASSWD: /usr/sbin/usermod" | sudo tee /etc/sudoers.d/azureuser
-            sudo chmod 0440 /etc/sudoers.d/azureuser
-          EOF
+      # - name: Configure password-less sudo for azureuser
+      #   run: |
+      #     ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
+      #       echo "azureuser ALL=(ALL) NOPASSWD: /usr/sbin/usermod" | sudo tee /etc/sudoers.d/azureuser
+      #       sudo chmod 0440 /etc/sudoers.d/azureuser
+      #     EOF
         
       # - name: Add user to docker group
       #   run: |
