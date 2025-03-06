@@ -107,7 +107,7 @@ jobs:
             [ -d "documentdb" ] && rm -rf "documentdb"
             [ -d "documentdb-1" ] && rm -rf "documentdb-1"
 
-            git clone https://github.com/${{ github.repository }}.git documentdb
+            git clone https://github.com/${{ github.repository }}.git /home/documentdb
             ls -a
             docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
             docker pull ghcr.io/${{ github.repository }}/documentdb:latest
