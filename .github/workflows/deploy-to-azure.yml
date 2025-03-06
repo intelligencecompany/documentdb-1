@@ -105,7 +105,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
             CONTAINER_NAME="documentdb"
-            [ -d "/home/$CONTAINER_NAME" ] && rm -rf "/home/$CONTAINER_NAME"
+            [ -d "/home/$CONTAINER_NAME" ] && sudo rm -rf "/home/$CONTAINER_NAME"
 
             sudo git clone https://github.com/${{ github.repository }}.git /home/$CONTAINER_NAME
             docker rm -f $CONTAINER_NAME 2>/dev/null || true
