@@ -105,10 +105,12 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
             CONTAINER_NAME="documentdb"
+            docker rm -f $CONTAINER_NAME 2>/dev/null || true
             [ -d "/home/$CONTAINER_NAME" ] && sudo rm -rf "/home/$CONTAINER_NAME"
 
             sudo git clone https://github.com/${{ github.repository }}.git /home/$CONTAINER_NAME
-            docker rm -f $CONTAINER_NAME 2>/dev/null || true
+            cd /home/$CONTAINER_NAME
+
             docker build . -f .devcontainer/Dockerfile -t $CONTAINER_NAME
             docker run -p 9712:9712 -v $(pwd):/home/$CONTAINER_NAME/code -i $CONTAINER_NAME
 
@@ -118,14 +120,14 @@ jobs:
             fi
 
             docker exec -it "$CONTAINER_NAME" bash -c "
-              cd /home/DocumentDB/code || exit 1
+              cd /home/$CONTAINER_NAME/code || exit 1
               echo 'Switched to code directory.'
 
               # Build and deploy binaries
               echo 'Building binaries...'
               make || { 
                 echo 'Build failed. Adding safe directory configuration.';
-                git config --global --add safe.directory /home/DocumentDB/code
+                git config --global --add safe.directory /home/$CONTAINER_NAME/code
                 make
               }
 
