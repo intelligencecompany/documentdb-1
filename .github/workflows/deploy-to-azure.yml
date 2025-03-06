@@ -109,9 +109,12 @@ jobs:
             [ -d "/home/documentdb" ] && rm -rf "/home/documentdb"
 
             sudo git clone https://github.com/${{ github.repository }}.git /home/documentdb
-            ls -a
-            docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
-            docker pull ghcr.io/${{ github.repository }}/documentdb:latest
             docker rm -f documentdb 2>/dev/null || true
+            docker build . -f .devcontainer/Dockerfile -t documentdb
             docker run -p 9712:9712 -v $(pwd):/home/documentdb/code -i ghcr.io/${{ github.repository }}/documentdb
           EOF
+
+          
+        # docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+        # docker pull ghcr.io/${{ github.repository }}/documentdb:latest
+        # docker rm -f documentdb 2>/dev/null || true
