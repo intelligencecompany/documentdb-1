@@ -105,6 +105,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
             git clone https://github.com/${{ github.repository }}.git
+            ls -a
             docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
             docker pull ghcr.io/${{ github.repository }}/documentdb:latest
             docker rm -f documentdb 2>/dev/null || true
