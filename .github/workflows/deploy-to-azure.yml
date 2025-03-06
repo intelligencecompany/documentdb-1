@@ -114,7 +114,7 @@ jobs:
             echo "${{ secrets.SUDO_PASSWORD }}" | sudo -S docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
             echo "${{ secrets.SUDO_PASSWORD }}" | sudo -S docker pull ghcr.io/${{ github.repository }}/documentdb:latest
             echo "${{ secrets.SUDO_PASSWORD }}" | sudo -S docker rm -f documentdb 2>/dev/null || true
-            echo "${{ secrets.SUDO_PASSWORD }}" | sudo -S docker run -p 9712:9712 --name documentdb --restart=on-failure:3 -i ghcr.io/${{ github.repository }}/documentdb
+            echo "${{ secrets.SUDO_PASSWORD }}" | sudo -S docker run -p 9712:9712 --name documentdb --restart=on-failure:3 -it ghcr.io/${{ github.repository }}/documentdb
           EOF
 # docker run -p 9712:9712 --name documentdb -i ghcr.io/intelligencecompany/documentdb-1/documentdb
       # - name: Pull and run Docker image on VM
