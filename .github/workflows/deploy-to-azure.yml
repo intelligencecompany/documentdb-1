@@ -104,14 +104,44 @@ jobs:
       - name: Pull and run Docker image on VM
         run: |
           ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
-            [ -d "documentdb" ] && rm -rf "documentdb"
-            [ -d "documentdb-1" ] && rm -rf "documentdb-1"
-            [ -d "/home/documentdb" ] && rm -rf "/home/documentdb"
+            CONTAINER_NAME="documentdb"
+            [ -d "$CONTAINER_NAME" ] && rm -rf "$CONTAINER_NAME"
+            [ -d "$CONTAINER_NAME-1" ] && rm -rf "$CONTAINER_NAME-1"
+            [ -d "/home/$CONTAINER_NAME" ] && rm -rf "/home/$CONTAINER_NAME"
 
-            sudo git clone https://github.com/${{ github.repository }}.git /home/documentdb
-            docker rm -f documentdb 2>/dev/null || true
-            docker build . -f .devcontainer/Dockerfile -t documentdb
-            docker run -p 9712:9712 -v $(pwd):/home/documentdb/code -i ghcr.io/${{ github.repository }}/documentdb
+            sudo git clone https://github.com/${{ github.repository }}.git /home/$CONTAINER_NAME
+            docker rm -f $CONTAINER_NAME 2>/dev/null || true
+            docker build . -f .devcontainer/Dockerfile -t $CONTAINER_NAME
+            docker run -p 9712:9712 -v $(pwd):/home/$CONTAINER_NAME/code -i $CONTAINER_NAME
+
+            if ! docker ps --format "{{.Names}}" | grep -q "^$CONTAINER_NAME$"; then
+              echo "Error: The container '$CONTAINER_NAME' is not running. Start the container first."
+              exit 1
+            fi
+
+            docker exec -it "$CONTAINER_NAME" bash -c "
+              cd /home/DocumentDB/code || exit 1
+              echo 'Switched to code directory.'
+
+              # Build and deploy binaries
+              echo 'Building binaries...'
+              make || { 
+                echo 'Build failed. Adding safe directory configuration.';
+                git config --global --add safe.directory /home/DocumentDB/code
+                make
+              }
+
+              echo 'Installing binaries...'
+              sudo make install
+
+              echo 'Running PostgreSQL backend tests...'
+              make check
+
+              echo 'Starting DocumentDB server...'
+              ./scripts/start_oss_server.sh
+            "
+
+            echo "Setup complete. You are now ready to work with DocumentDB."
           EOF
 
           
