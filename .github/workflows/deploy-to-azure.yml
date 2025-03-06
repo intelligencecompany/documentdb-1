@@ -112,17 +112,21 @@ jobs:
           az vm resize --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name TERMSMONITOR --size Standard_B2s
           echo "VM resized to Standard_B2s"
 
+      - name: Check System Memory
+        run: free -h
+
       - name: Pull and run Docker image on VM
         run: |
           ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
             docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
             docker pull ghcr.io/${{ github.repository }}/documentdb:latest
             docker rm -f documentdb 2>/dev/null || true
-            docker run -p 9712:9712 --name documentdb --restart=on-failure:3 -d ghcr.io/${{ github.repository }}/documentdb
+            docker run --memory=4g --oom-kill-disable -p 9712:9712 --name documentdb --restart=on-failure:3 -d ghcr.io/${{ github.repository }}/documentdb
             docker exec documentdb /bin/bash -c "export TERM=xterm && /home/documentdb/startup.sh"
           EOF
 
       - name: Resize VM back to B1s
+        if: always()
         run: |
           az vm resize --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name TERMSMONITOR --size Standard_B1s
           echo "VM resized back to Standard_B1s"
