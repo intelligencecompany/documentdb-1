@@ -114,7 +114,7 @@ jobs:
 
       - name: Wait for the VM to be in 'Running' state
         run: |
-          az vm wait --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name TERMSMONITOR --custom "provisioningState=='Succeeded'"
+          az vm wait --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name TERMSMONITOR --custom "provisioningState=='Succeeded'" --timeout
           echo "VM is now running."
 
       - name: Check System Memory
