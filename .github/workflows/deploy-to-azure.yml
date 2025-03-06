@@ -21,8 +21,10 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t ghcr.io/${{ github.repository }}/documentdb:latest . -f .devcontainer/Dockerfile
-          docker push ghcr.io/${{ github.repository }}/documentdb:latest
+          docker build . -f .devcontainer/Dockerfile -t documentdb
+          docker image tag documentdb ghcr.io/${{ github.repository }}/documentdb:latest
+          docker image ls
+          docker image push ghcr.io/${{ github.repository }}/documentdb:latest
 
   # infra:
   #   runs-on: ubuntu-latest
@@ -95,8 +97,8 @@ jobs:
       - name: Pull and run Docker image on VM
         run: |
           ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
-            sudo docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
-            sudo docker pull ghcr.io/${{ github.repository }}/documentdb:latest
-            sudo docker rm -f documentdb 2>/dev/null || true
-            sudo docker run -p 9712:9712 -v $(pwd):/home/documentdb/code -i ghcr.io/${{ github.repository }}/documentdb
+            docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+            docker pull ghcr.io/${{ github.repository }}/documentdb:latest
+            docker rm -f documentdb 2>/dev/null || true
+            docker run -p 9712:9712 -v $(pwd):/home/documentdb/code -i ghcr.io/${{ github.repository }}/documentdb
           EOF
