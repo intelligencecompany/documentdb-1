@@ -12,6 +12,7 @@ fi
 cd code
 codeDir="$( cd -P "$( dirname "$source" )" && pwd )"
 echo $codeDir
+ls -a
 
 # Check if the setup has already been completed
 if [ ! -f "$FLAG_FILE" ]; then
@@ -53,4 +54,4 @@ exec "$@"
 
 # az ad sp create-for-rbac --name "TERMSMONITOR-GITHUB-SP" --role contributor --scopes /subscriptions/cb3e4e98-0e25-431b-9d61-521be63f873f/resourceGroups/RG-TERMSMONITOR --sdk-auth
 # docker build -t ghcr.io/intelligencecompany/documentdb-1/documentdb -f .devcontainer/Dockerfile .
-# docker run -p 9712:9712 -v $(pwd):/home/documentdb/code -it ghcr.io/intelligencecompany/documentdb-1/documentdb /bin/bash
+# docker run -p 9712:9712 -v $(pwd):/home/documentdb/code -i ghcr.io/intelligencecompany/documentdb-1/documentdb /bin/bash
