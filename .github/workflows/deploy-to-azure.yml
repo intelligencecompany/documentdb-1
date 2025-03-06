@@ -122,7 +122,7 @@ jobs:
             docker pull ghcr.io/${{ github.repository }}/documentdb:latest
             docker rm -f documentdb 2>/dev/null || true
             docker run --memory=4g --oom-kill-disable -p 9712:9712 --name documentdb --restart=on-failure:3 -d ghcr.io/${{ github.repository }}/documentdb
-            docker exec documentdb /bin/bash -c "export TERM=xterm && /home/documentdb/startup.sh"
+            docker exec -i documentdb /bin/bash -c "export TERM=xterm && /home/documentdb/startup.sh"
           EOF
 
       - name: Resize VM back to B1s
