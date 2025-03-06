@@ -103,10 +103,12 @@ jobs:
       
       - name: Pull and run Docker image on VM
         run: |
-          docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
-          docker pull ghcr.io/${{ github.repository }}/documentdb:latest
-          docker rm -f documentdb 2>/dev/null || true
-          docker run -p 9712:9712 --name documentdb -i ghcr.io/${{ github.repository }}/documentdb
+          ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
+            docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+            docker pull ghcr.io/${{ github.repository }}/documentdb:latest
+            docker rm -f documentdb 2>/dev/null || true
+            docker run -p 9712:9712 --name documentdb -i ghcr.io/${{ github.repository }}/documentdb
+          EOF
 
       # - name: Pull and run Docker image on VM
       #   run: |
