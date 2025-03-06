@@ -126,8 +126,8 @@ jobs:
             docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
             docker pull ghcr.io/${{ github.repository }}/documentdb:latest
             docker rm -f documentdb 2>/dev/null || true
-            docker container prune
-            docker run --memory=4g --oom-kill-disable -p 9712:9712 --name documentdb --restart=on-failure:3 -d ghcr.io/${{ github.repository }}/documentdb
+            docker container prune -a -f
+            docker run --oom-kill-disable -p 9712:9712 --name documentdb --restart=on-failure:3 -d ghcr.io/${{ github.repository }}/documentdb
             docker exec -i documentdb /bin/bash -c "export TERM=xterm && /home/documentdb/startup.sh"
           EOF
 
