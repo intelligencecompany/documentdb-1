@@ -98,7 +98,7 @@ jobs:
       - name: Add user to docker group
         run: |
           ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
-            sudo usermod -aG docker azureuser
+            echo "your_password" | sudo -S usermod -aG docker azureuser
           EOF
       
       - name: Pull and run Docker image on VM
