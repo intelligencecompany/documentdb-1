@@ -107,10 +107,15 @@ jobs:
       #     ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
       #       echo "your_password" | sudo -S usermod -aG docker azureuser
       #     EOF
-      - name: Resize VM to B2s
+      - name: Resize VM to B4ms
         run: |
-          az vm resize --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name TERMSMONITOR --size Standard_B2s
-          echo "VM resized to Standard_B2s"
+          az vm resize --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name TERMSMONITOR --size Standard_B4ms
+          echo "VM resized to Standard_B4ms"
+
+      - name: Wait for the VM to be in 'Running' state
+        run: |
+          az vm wait --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name TERMSMONITOR --status "VM running"
+          echo "VM is now running."
 
       - name: Check System Memory
         run: free -h
