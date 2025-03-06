@@ -94,6 +94,12 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
 
+      - name: Add user to docker group
+        run: |
+          ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
+            sudo usermod -aG docker azureuser
+          EOF
+
       - name: Pull and run Docker image on VM
         run: |
           ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
