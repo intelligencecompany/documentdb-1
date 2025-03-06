@@ -124,7 +124,7 @@ RUN cat /etc/sudoers | grep secure_path | sed "s/\:\/bin\:/\:\/bin\:\/usr\/lib\/
 # Add PG to the path
 ENV PATH=$PATH:/usr/lib/postgresql/$PG_VERSION/bin
 
-# COPY scripts/startup.sh /home/documentdb/startup.sh
+COPY . /home/documentdb/code
 # RUN sudo chmod +x /home/documentdb/startup.sh
 # RUN [ "bin/bash", "-c", "/home/documentdb/startup.sh" ]
 

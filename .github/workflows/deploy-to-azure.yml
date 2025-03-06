@@ -100,60 +100,67 @@ jobs:
           ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
             sudo usermod -aG docker azureuser
           EOF
-
+      
       - name: Pull and run Docker image on VM
         run: |
-          ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
-            CONTAINER_NAME="documentdb"
-            docker rm -f $CONTAINER_NAME 2>/dev/null || true
-            [ -d "/home/$CONTAINER_NAME" ] && sudo rm -rf "/home/$CONTAINER_NAME"
+          docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+          docker pull ghcr.io/${{ github.repository }}/documentdb:latest
+          docker rm -f documentdb 2>/dev/null || true
+          docker run -p 9712:9712 --name documentdb -i ghcr.io/${{ github.repository }}/documentdb
 
-            sudo git clone https://github.com/${{ github.repository }}.git /home/$CONTAINER_NAME
-            cd /home/$CONTAINER_NAME
+      # - name: Pull and run Docker image on VM
+      #   run: |
+      #     ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
+      #       CONTAINER_NAME="documentdb"
+      #       docker rm -f $CONTAINER_NAME 2>/dev/null || true
+      #       [ -d "/home/$CONTAINER_NAME" ] && sudo rm -rf "/home/$CONTAINER_NAME"
 
-            docker build . -f .devcontainer/Dockerfile -t $CONTAINER_NAME
-            docker run -p 9712:9712 -v $(pwd):/home/$CONTAINER_NAME/code -i $CONTAINER_NAME
+      #       sudo git clone https://github.com/${{ github.repository }}.git /home/$CONTAINER_NAME
+      #       cd /home/$CONTAINER_NAME
 
-            if ! docker ps --format "{{.Names}}" | grep -q "^$CONTAINER_NAME$"; then
-              echo "Error: The container '$CONTAINER_NAME' is not running. Start the container first."
-              exit 1
-            fi
+      #       docker build . -f .devcontainer/Dockerfile -t $CONTAINER_NAME
+      #       docker run -p 9712:9712 -v $(pwd):/home/$CONTAINER_NAME/code -i $CONTAINER_NAME
 
-            docker exec -it "$CONTAINER_NAME" bash -c "
-              cd /home/$CONTAINER_NAME/code || exit 1
-              echo 'Switched to code directory.'
+      #       if ! docker ps --format "{{.Names}}" | grep -q "^$CONTAINER_NAME$"; then
+      #         echo "Error: The container '$CONTAINER_NAME' is not running. Start the container first."
+      #         exit 1
+      #       fi
 
-              # Build and deploy binaries
-              echo 'Building binaries...'
-              make || { 
-                echo 'Build failed. Adding safe directory configuration.';
-                git config --global --add safe.directory /home/$CONTAINER_NAME/code
-                make
-              }
+      #       docker exec -it "$CONTAINER_NAME" bash -c "
+      #         cd /home/$CONTAINER_NAME/code || exit 1
+      #         echo 'Switched to code directory.'
 
-              echo 'Installing binaries...'
-              sudo make install
+      #         # Build and deploy binaries
+      #         echo 'Building binaries...'
+      #         make || { 
+      #           echo 'Build failed. Adding safe directory configuration.';
+      #           git config --global --add safe.directory /home/$CONTAINER_NAME/code
+      #           make
+      #         }
 
-              echo 'Running PostgreSQL backend tests...'
-              make check
+      #         echo 'Installing binaries...'
+      #         sudo make install
 
-              echo 'Starting DocumentDB server...'
-              ./scripts/start_oss_server.sh
+      #         echo 'Running PostgreSQL backend tests...'
+      #         make check
+
+      #         echo 'Starting DocumentDB server...'
+      #         ./scripts/start_oss_server.sh
               
-              echo 'Resetting DocumentDB server...'
-              ./scripts/start_oss_server.sh -c
+      #         echo 'Resetting DocumentDB server...'
+      #         ./scripts/start_oss_server.sh -c
 
-              echo "host    all             all             94.215.14.79/32               trust" >> ~/documentdb_test/pg_hba.conf
-              echo "host    all             all             192.168.178.43/32             trust" >> ~/documentdb_test/pg_hba.conf
-              echo "host    all             all             172.17.0.2/32             trust" >> ~/documentdb_test/pg_hba.conf
+      #         echo "host    all             all             94.215.14.79/32               trust" >> ~/documentdb_test/pg_hba.conf
+      #         echo "host    all             all             192.168.178.43/32             trust" >> ~/documentdb_test/pg_hba.conf
+      #         echo "host    all             all             172.17.0.2/32             trust" >> ~/documentdb_test/pg_hba.conf
 
-              # Edit the postgresql.conf file
-              echo "listen_addresses = '*'" >> ~/documentdb_test/postgresql.conf
+      #         # Edit the postgresql.conf file
+      #         echo "listen_addresses = '*'" >> ~/documentdb_test/postgresql.conf
 
-            "
+      #       "
 
-            echo "Setup complete. You are now ready to work with DocumentDB."
-          EOF
+      #       echo "Setup complete. You are now ready to work with DocumentDB."
+      #     EOF
 
           
         # docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
