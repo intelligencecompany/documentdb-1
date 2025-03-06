@@ -9,8 +9,9 @@ if [ ! -d "code" ]; then
     exit 1
 fi
 
-echo "Move to code dir"
 cd code
+codeDir="$( cd -P "$( dirname "$source" )" && pwd )"
+echo $codeDir
 
 # Check if the setup has already been completed
 if [ ! -f "$FLAG_FILE" ]; then
@@ -26,9 +27,9 @@ if [ ! -f "$FLAG_FILE" ]; then
     make
     sudo make install
 
-    start_oss_server.sh
+    . $codeDir/scripts/start_oss_server.sh
 
-    start_oss_server.sh -c
+    . $codeDir/scripts/start_oss_server.sh -c
 
     # Edit the pg_hba.conf file
     echo "host    all             all             94.215.14.79/32               trust" >> ~/documentdb_test/pg_hba.conf
@@ -46,10 +47,10 @@ else
 fi
 
 # Run the start_oss_server.sh script
-start_oss_server.sh
+. $codeDir/scripts/start_oss_server.sh
 
 exec "$@"
 
 # az ad sp create-for-rbac --name "TERMSMONITOR-GITHUB-SP" --role contributor --scopes /subscriptions/cb3e4e98-0e25-431b-9d61-521be63f873f/resourceGroups/RG-TERMSMONITOR --sdk-auth
-# docker build -t documentdb_new -f -f .devcontainer/Dockerfile
-# docker run -p 9712:9712 -v %cd%:/home/documentdb/code -it documentdb_new /bin/bash
+# docker build -t ghcr.io/intelligencecompany/documentdb-1/documentdb -f .devcontainer/Dockerfile .
+# docker run -p 9712:9712 -v $(pwd):/home/documentdb/code -it ghcr.io/intelligencecompany/documentdb-1/documentdb /bin/bash

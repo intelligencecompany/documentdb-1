@@ -105,7 +105,6 @@ RUN add-apt-repository -y ppa:ubuntugis/ppa && apt-get update && \
 COPY scripts/install_setup_postgis.sh /tmp/install_setup/
 RUN [ "bin/bash", "-c", "PGVERSION=$PG_VERSION /tmp/install_setup/install_setup_postgis.sh" ]
 
-
 # locale
 RUN rm -rf /var/lib/apt/lists/* \
     && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
@@ -125,12 +124,13 @@ RUN cat /etc/sudoers | grep secure_path | sed "s/\:\/bin\:/\:\/bin\:\/usr\/lib\/
 # Add PG to the path
 ENV PATH=$PATH:/usr/lib/postgresql/$PG_VERSION/bin
 
+COPY scripts/startup.sh /home/documentdb/startup.sh
+RUN sudo chmod +x /home/documentdb/startup.sh
+# RUN [ "bin/bash", "-c", "/home/documentdb/startup.sh" ]
+
 USER documentdb
 WORKDIR /home/documentdb
 
-EXPOSE 9712 5432
-
-COPY scripts/startup.sh /home/documentdb/startup.sh
-RUN sudo chmod +x /home/documentdb/startup.sh
+# EXPOSE 9712 5432
 
 ENTRYPOINT ["/home/documentdb/startup.sh"]
