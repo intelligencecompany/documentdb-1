@@ -6,26 +6,26 @@ on:
       - main
 
 jobs:
-  # build:
-  #   runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v2
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-  #     - name: Set up Docker Buildx
-  #       uses: docker/setup-buildx-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
-  #     - name: Log in to GitHub Packages
-  #       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Log in to GitHub Packages
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-  #     - name: Build and push Docker image
-  #       run: |
-  #         git clone https://github.com/${{ github.repository }}.git
-  #         docker build . -f .devcontainer/Dockerfile -t documentdb
-  #         docker image tag documentdb ghcr.io/${{ github.repository }}/documentdb:latest
-  #         docker image ls
-  #         docker image push ghcr.io/${{ github.repository }}/documentdb:latest
+      - name: Build and push Docker image
+        run: |
+          git clone https://github.com/${{ github.repository }}.git
+          docker build . -f .devcontainer/Dockerfile -t documentdb
+          docker image tag documentdb ghcr.io/${{ github.repository }}/documentdb:latest
+          docker image ls
+          docker image push ghcr.io/${{ github.repository }}/documentdb:latest
 
   # infra:
   #   runs-on: ubuntu-latest
@@ -109,7 +109,7 @@ jobs:
             docker rm -f documentdb 2>/dev/null || true
             docker run -p 9712:9712 --name documentdb -i ghcr.io/${{ github.repository }}/documentdb
           EOF
-
+# docker run -p 9712:9712 --name documentdb -i ghcr.io/intelligencecompany/documentdb-1/documentdb
       # - name: Pull and run Docker image on VM
       #   run: |
       #     ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
@@ -152,9 +152,11 @@ jobs:
       #         echo 'Resetting DocumentDB server...'
       #         ./scripts/start_oss_server.sh -c
 
-      #         echo "host    all             all             94.215.14.79/32               trust" >> ~/documentdb_test/pg_hba.conf
-      #         echo "host    all             all             192.168.178.43/32             trust" >> ~/documentdb_test/pg_hba.conf
-      #         echo "host    all             all             172.17.0.2/32             trust" >> ~/documentdb_test/pg_hba.conf
+              # echo "host    all             all             94.215.14.79/32               trust" >> ~/documentdb_test/pg_hba.conf
+              # echo "host    all             all             192.168.178.43/32             trust" >> ~/documentdb_test/pg_hba.conf
+              # echo "host    all             all             172.17.0.4/32             trust" >> ~/documentdb_test/pg_hba.conf
+              # echo "host    all             all             0.0.0.0/32             trust" >> ~/documentdb_test/pg_hba.conf
+              # echo "listen_addresses = '*'" >> ~/documentdb_test/postgresql.conf
 
       #         # Edit the postgresql.conf file
       #         echo "listen_addresses = '*'" >> ~/documentdb_test/postgresql.conf

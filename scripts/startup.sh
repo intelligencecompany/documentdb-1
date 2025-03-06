@@ -12,17 +12,16 @@ fi
 cd code
 codeDir="$( cd -P "$( dirname "$source" )" && pwd )"
 echo $codeDir
-ls -a
 
 # Check if the setup has already been completed
 if [ ! -f "$FLAG_FILE" ]; then
     echo "First run setup"
 
-    # Check if the Makefile exists
-    # if [ ! -f "Makefile" ]; then
-    #     echo "Error: Makefile does not exist."
-    #     exit 1
-    # fi
+    Check if the Makefile exists
+    if [ ! -f "Makefile" ]; then
+        echo "Error: Makefile does not exist."
+        exit 1
+    fi
 
     git config --global --add safe.directory /home/DocumentDB/code
     make
@@ -36,6 +35,7 @@ if [ ! -f "$FLAG_FILE" ]; then
     echo "host    all             all             94.215.14.79/32               trust" >> ~/documentdb_test/pg_hba.conf
     echo "host    all             all             192.168.178.43/32             trust" >> ~/documentdb_test/pg_hba.conf
     echo "host    all             all             172.17.0.2/32             trust" >> ~/documentdb_test/pg_hba.conf
+    echo "host    all             all             172.17.0.1/32             trust" >> ~/documentdb_test/pg_hba.conf
 
     # Edit the postgresql.conf file
     echo "listen_addresses = '*'" >> ~/documentdb_test/postgresql.conf
