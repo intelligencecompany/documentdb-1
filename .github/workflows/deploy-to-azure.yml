@@ -95,19 +95,26 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.AZURE_SSH_PRIVATE_KEY }}
 
-      - name: Add user to docker group
+      - name: Configure password-less sudo for azureuser
         run: |
           ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
-            echo "your_password" | sudo -S usermod -aG docker azureuser
+            echo "azureuser ALL=(ALL) NOPASSWD: /usr/sbin/usermod" | sudo tee /etc/sudoers.d/azureuser
+            sudo chmod 0440 /etc/sudoers.d/azureuser
           EOF
+        
+      # - name: Add user to docker group
+      #   run: |
+      #     ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
+      #       echo "your_password" | sudo -S usermod -aG docker azureuser
+      #     EOF
       
       - name: Pull and run Docker image on VM
         run: |
           ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
-            docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
-            docker pull ghcr.io/${{ github.repository }}/documentdb:latest
-            docker rm -f documentdb 2>/dev/null || true
-            docker run -p 9712:9712 --name documentdb --restart=on-failure:3 -i ghcr.io/${{ github.repository }}/documentdb
+            sudo docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+            sudo docker pull ghcr.io/${{ github.repository }}/documentdb:latest
+            sudo docker rm -f documentdb 2>/dev/null || true
+            sudo docker run -p 9712:9712 --name documentdb --restart=on-failure:3 -i ghcr.io/${{ github.repository }}/documentdb
           EOF
 # docker run -p 9712:9712 --name documentdb -i ghcr.io/intelligencecompany/documentdb-1/documentdb
       # - name: Pull and run Docker image on VM
