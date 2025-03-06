@@ -105,8 +105,6 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no azureuser@${{ env.VM_IP }} << 'EOF'
             CONTAINER_NAME="documentdb"
-            [ -d "$CONTAINER_NAME" ] && rm -rf "$CONTAINER_NAME"
-            [ -d "$CONTAINER_NAME-1" ] && rm -rf "$CONTAINER_NAME-1"
             [ -d "/home/$CONTAINER_NAME" ] && rm -rf "/home/$CONTAINER_NAME"
 
             sudo git clone https://github.com/${{ github.repository }}.git /home/$CONTAINER_NAME
@@ -139,6 +137,17 @@ jobs:
 
               echo 'Starting DocumentDB server...'
               ./scripts/start_oss_server.sh
+              
+              echo 'Resetting DocumentDB server...'
+              ./scripts/start_oss_server.sh -c
+
+              echo "host    all             all             94.215.14.79/32               trust" >> ~/documentdb_test/pg_hba.conf
+              echo "host    all             all             192.168.178.43/32             trust" >> ~/documentdb_test/pg_hba.conf
+              echo "host    all             all             172.17.0.2/32             trust" >> ~/documentdb_test/pg_hba.conf
+
+              # Edit the postgresql.conf file
+              echo "listen_addresses = '*'" >> ~/documentdb_test/postgresql.conf
+
             "
 
             echo "Setup complete. You are now ready to work with DocumentDB."
