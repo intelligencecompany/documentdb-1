@@ -127,7 +127,7 @@ ENV PATH=$PATH:/usr/lib/postgresql/$PG_VERSION/bin
 COPY . /home/documentdb/code
 COPY scripts/startup.sh /home/documentdb/startup.sh
 RUN sudo chmod +x /home/documentdb/startup.sh
-RUN [ "bin/bash", "-c", "/home/documentdb/startup.sh" ]
+# RUN [ "bin/bash", "-c", "/home/documentdb/startup.sh" ]
 
 USER documentdb
 WORKDIR /home/documentdb
